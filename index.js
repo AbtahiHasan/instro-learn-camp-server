@@ -43,6 +43,17 @@ async function run() {
     const classes_collection = db.collection("classes")
 
 
+    // verify admin 
+    const verityAdmin = async (req, res, next) => {
+      const email = req.decoded.email
+      const user = await users_collection.findOne({email: email})
+      if(user?.role !== "admin") {
+          return res.status(401).send({error: true, message: "unauthorized access"})
+      }
+          next()
+      
+    }
+
     app.get("/", (req, res) => {
         res.send("camp is running")
     })
