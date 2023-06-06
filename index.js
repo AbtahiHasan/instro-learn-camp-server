@@ -22,11 +22,22 @@ async function run() {
   try {
 
     await client.connect();
+    const db = client.db("instro_learn_camp")
+    const users_collection = db.collection("users")
+    const instructors_collection = db.collection("instructors")
+    const classes_collection = db.collection("classes")
+
 
     app.get("/", (req, res) => {
         res.send("camp is running")
     })
-    
+    app.post("/jwt", (req, res) => {
+        const email = req.query.email
+        const token = jwt.sign({
+            email: email,
+        }, process.env.SECKRET_KEY, { expiresIn: '10h' })
+        res.send({token}) 
+    })
 
 
     await client.db("admin").command({ ping: 1 });
