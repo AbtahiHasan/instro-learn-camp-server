@@ -2,7 +2,11 @@ require("dotenv").config()
 const express = require("express")
 const port = process.env.PORT || 3000
 const app = express()
+const jwt = require("jsonwebtoken")
+const cors = req("cors")
 const { MongoClient, ServerApiVersion } = require('mongodb');
+
+app.use(cors())
 
 // verify jwt token 
 const verifyToken = (req, res, next) => {
@@ -65,6 +69,13 @@ async function run() {
         res.send({token}) 
     })
 
+
+
+    // instructors requests 
+    app.get("/instructors", async (req, res) => {
+      const instructors = await instructors_collection.find().toArray()
+      res.send(instructors)
+    })
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
