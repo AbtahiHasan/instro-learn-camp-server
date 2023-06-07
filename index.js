@@ -59,6 +59,15 @@ async function run() {
       
     }
 
+    const verityInstructor = async (req, res, next) => {
+      const email = req.decoded.email
+      const user = await users_collection.findOne({email: email})
+      if(user?.role !== "instructor") {
+          return res.status(401).send({error: true, message: "unauthorized access"})
+      }
+          next()
+      
+    }
     app.get("/", (req, res) => {
         res.send("camp is running")
     })
@@ -114,7 +123,7 @@ async function run() {
        res.send(classes)
     })
 
-    app.post("/add-class", async (req, res) => {
+    app.post("/add-class", verifyToken, verityInstructor, async (req, res) => {
       const data = req.body 
       const newClass = {
         class_name : data.class_name,
@@ -127,6 +136,12 @@ async function run() {
 
       const result = await classes_collection.insertOne(newClass)
       res.send(result)
+    })
+
+    app.get("/my-classes", verifyToken, verityInstructor, async(req, res) => {
+        const email = req.query?.email
+        const result = await classes_collection.find({email: email}).toArray()
+        res.send(result)
     })
 
 
