@@ -3,11 +3,12 @@ const express = require("express")
 const port = process.env.PORT || 3000
 const app = express()
 const jwt = require("jsonwebtoken")
-const cors = req("cors")
+const cors = require("cors")
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-app.use(cors())
 
+app.use(cors())
+app.use(express.json())
 // verify jwt token 
 const verifyToken = (req, res, next) => {
   const authorization = req.headers.authorization
@@ -69,12 +70,48 @@ async function run() {
         res.send({token}) 
     })
 
+    // checking authorization 
+    app.get("/authorization", async (req, res) => {
+      const email = req.query.email 
+      const user = await users_collection.findOne({email: email})
+      if(user) {
+        res.send({role: user?.role}) 
+      }
+    })
 
+    // users requests
+
+    app.put("/add-user", async (req, res) => {
+      const userData = req.body
+      const email = req.query.email
+      const filter = {
+        email: email
+      }
+      const user = {
+        $set: {
+          name: userData?.name,
+          email: userData?.email,
+          photo_url: userData?.photo_url,
+          role: "user"
+        }
+      }
+      const options = { upsert: true };
+      const result = await  users_collection.updateOne(filter, user, options)
+      res.send(result)
+
+    })
 
     // instructors requests 
     app.get("/instructors", async (req, res) => {
       const instructors = await instructors_collection.find().toArray()
       res.send(instructors)
+    })
+
+    // classes requests 
+    app.get("/classes", async (req, res) => {
+       const classStatus = req.query.status
+       const classes = await classes_collection.find({status: classStatus}).toArray()
+       res.send(classes)
     })
 
     await client.db("admin").command({ ping: 1 });
