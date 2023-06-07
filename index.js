@@ -92,7 +92,6 @@ async function run() {
           name: userData?.name,
           email: userData?.email,
           photo_url: userData?.photo_url,
-          role: "user"
         }
       }
       const options = { upsert: true };
@@ -110,9 +109,33 @@ async function run() {
     // classes requests 
     app.get("/classes", async (req, res) => {
        const classStatus = req.query.status
-       const classes = await classes_collection.find({status: classStatus}).toArray()
+       const filter = classStatus === "all" ? {} : {status: classStatus}
+       const classes = await classes_collection.find(filter).toArray()
        res.send(classes)
     })
+
+    app.post("/add-class", async (req, res) => {
+      const data = req.body 
+      const newClass = {
+        class_name : data.class_name,
+            class_image : data.class_image,
+            instructor_name : data.instructor_name,
+            instructor_email : data.instructor_email,
+            avilable_seats : parseFloat(data.avilable_seats),
+            price : parseFloat(data.price),
+      }
+
+      const result = await classes_collection.insertOne(newClass)
+      res.send(result)
+    })
+
+
+    // admin page req 
+    app.get("/users", verifyToken, verityAdmin ,async (req, res) => {
+      const result = await users_collection.find().toArray()
+        res.send(result)
+    })
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
