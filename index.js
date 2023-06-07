@@ -139,8 +139,8 @@ async function run() {
     })
 
     app.get("/my-classes", verifyToken, verityInstructor, async(req, res) => {
-        const email = req.query?.email
-        const result = await classes_collection.find({email: email}).toArray()
+        const email = req?.query?.email
+        const result = await classes_collection.find({instructor_email: email}).toArray()
         res.send(result)
     })
 
