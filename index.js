@@ -207,7 +207,14 @@ async function run() {
       const insertResult = await payments_collection.insertOne(payment);
 
       const query = { _id: { $in: payment.selectedClasses.map(id => new ObjectId(id)) } }
+      console.log()
       const deleteResult = await seleted_collection.deleteMany(query)
+
+      const classesQuery = {_id: {$in: payment.classes.map(classId => new ObjectId(classId))}}
+
+      const paidClasses = await classes_collection.find(classesQuery).toArray()
+
+      await enrolled_collection.insertMany(paidClasses)
 
       res.send({ insertResult, deleteResult });
     })
