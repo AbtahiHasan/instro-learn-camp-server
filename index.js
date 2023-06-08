@@ -180,6 +180,13 @@ async function run() {
         res.send(result)
     })
 
+    app.get("/enrolled-classes", verifyToken, async(req, res) => {
+      const email = req?.query?.email
+        const result = await enrolled_collection.find({email: email}).toArray()
+        res.send(result)
+    })
+
+    
     app.delete("/delete-selected-class/:id", verifyToken, async (req, res) => {
       const id = req.params.id 
       const result = await seleted_collection.deleteOne({_id: new ObjectId(id)})
@@ -205,17 +212,27 @@ async function run() {
     app.post('/payments', verifyToken, async (req, res) => {
       const payment = req.body;
       const insertResult = await payments_collection.insertOne(payment);
-
       const query = { _id: { $in: payment.selectedClasses.map(id => new ObjectId(id)) } }
-      console.log()
       const deleteResult = await seleted_collection.deleteMany(query)
-
       const classesQuery = {_id: {$in: payment.classes.map(classId => new ObjectId(classId))}}
-
-      const paidClasses = await classes_collection.find(classesQuery).toArray()
-
-      await enrolled_collection.insertMany(paidClasses)
-
+      const option = {
+        projection : {
+          _id: 0,
+          class_image: 1,
+          class_name: 1,
+          instructor_name: 1,
+          instructor_email: 1,
+          price: 1
+        }
+      }
+      const paidClasses = await classes_collection.find(classesQuery, option).toArray()
+      const enrolled = paidClasses.map(paidClass => {
+        return {
+          ...paidClass,
+          email: payment.email
+        }
+      })
+      await enrolled_collection.insertMany(enrolled)
       res.send({ insertResult, deleteResult });
     })
 
