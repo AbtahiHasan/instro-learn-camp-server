@@ -4,7 +4,8 @@ const port = process.env.PORT || 3000
 const app = express()
 const jwt = require("jsonwebtoken")
 const cors = require("cors")
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY)
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 app.use(cors())
@@ -173,6 +174,17 @@ async function run() {
     })
 
 
+    app.get("/selected-classes", verifyToken, async(req, res) => {
+      const email = req?.query?.email
+        const result = await seleted_collection.find({email: email}).toArray()
+        res.send(result)
+    })
+
+    app.delete("/delete-selected-class/:id", verifyToken, async (req, res) => {
+      const id = req.params.id 
+      const result = await seleted_collection.deleteOne({_id: new ObjectId(id)})
+      res.send(result)
+    })
 
     // payments 
     app.post('/create-payment-intent', verifyToken, async (req, res) => {
@@ -193,8 +205,8 @@ async function run() {
     app.post('/payments', verifyToken, async (req, res) => {
       const payment = req.body;
       const insertResult = await payments_collection.insertOne(payment);
-// TODO 
-      const query = { _id: { $in: payment.selected_class.map(id => new ObjectId(id)) } }
+
+      const query = { _id: { $in: payment.selectedClasses.map(id => new ObjectId(id)) } }
       const deleteResult = await seleted_collection.deleteMany(query)
 
       res.send({ insertResult, deleteResult });
