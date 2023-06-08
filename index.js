@@ -136,9 +136,27 @@ async function run() {
             instructor_email : data.instructor_email,
             avilable_seats : parseFloat(data.avilable_seats),
             price : parseFloat(data.price),
+            status: "pending",
+            enrolled: 0,
+            feedback: "",
       }
 
       const result = await classes_collection.insertOne(newClass)
+      res.send(result)
+    })
+
+    // change status 
+    app.put("/change-class-status/:id", verifyToken, verityAdmin, async (req, res) => {
+      const status = req.body.status
+      const id = req.params.id 
+      const filter = {_id: new ObjectId(id)}
+      const updatedStatus = {
+        $set: {
+          status: status
+        },
+
+      }
+      const result = await classes_collection.updateOne(filter, updatedStatus)
       res.send(result)
     })
 
@@ -173,6 +191,21 @@ async function run() {
         res.send(result)
     })
 
+
+    // feedback 
+    app.put("/send-feedback/:id", verifyToken, verityAdmin, async (req, res) => {
+      const feedback = req.body.feedback
+      const id = req.params.id 
+      const filter = {_id: new ObjectId(id)}
+      const updatedFeedBack = {
+        $set: {
+          feedback: feedback
+        },
+
+      }
+      const result = await classes_collection.updateOne(filter, updatedFeedBack)
+      res.send(result)
+    })
 
     app.get("/selected-classes", verifyToken, async(req, res) => {
       const email = req?.query?.email
