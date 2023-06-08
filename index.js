@@ -160,6 +160,22 @@ async function run() {
       res.send(result)
     })
 
+    // update user role
+
+    app.put("/change-user-role/:id", verifyToken, verityAdmin, async (req, res) => {
+      const role = req.body.role
+      const id = req.params.id 
+      const filter = {_id: new ObjectId(id)}
+      const updatedRole = {
+        $set: {
+          role: role
+        },
+
+      }
+      const result = await classes_collection.updateOne(filter, updatedRole)
+      res.send(result)
+    })
+
     app.get("/my-classes", verifyToken, verityInstructor, async(req, res) => {
         const email = req?.query?.email
         const result = await classes_collection.find({instructor_email: email}).toArray()
