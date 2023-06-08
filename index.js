@@ -46,6 +46,9 @@ async function run() {
     const users_collection = db.collection("users")
     const instructors_collection = db.collection("instructors")
     const classes_collection = db.collection("classes")
+    const seleted_collection = db.collection("seleted_classes")
+    const payments_collection = db.collection("payments")
+    const enrolled_collection = db.collection("enrolled_classes")
 
 
     // verify admin 
@@ -152,6 +155,25 @@ async function run() {
     })
 
 
+    app.post("/select-class", verifyToken, async(req, res) => {
+      const singleClass = req.body
+
+      const addToClass = {
+        class_id: singleClass.class_id,
+        class_name : singleClass.class_name,
+        class_image : singleClass.class_image,
+        instructor_name : singleClass.instructor_name,
+        instructor_email : singleClass.instructor_email,
+        price : singleClass.price,
+        email: singleClass.email
+    }
+
+        const result = await seleted_collection.insertOne(addToClass)
+        res.send(result)
+    })
+
+
+
     // payments 
     app.post('/create-payment-intent', verifyToken, async (req, res) => {
       const { price } = req.body;
@@ -166,6 +188,19 @@ async function run() {
         clientSecret: paymentIntent.client_secret
       })
     })
+
+
+    app.post('/payments', verifyToken, async (req, res) => {
+      const payment = req.body;
+      const insertResult = await payments_collection.insertOne(payment);
+// TODO 
+      const query = { _id: { $in: payment.selected_class.map(id => new ObjectId(id)) } }
+      const deleteResult = await seleted_collection.deleteMany(query)
+
+      res.send({ insertResult, deleteResult });
+    })
+
+
 
 
     await client.db("admin").command({ ping: 1 });
