@@ -238,7 +238,7 @@ async function run() {
 
     app.get("/payment-history", verifyToken, async (req, res) => {
       const email = req?.query?.email
-      const result = await payments_collection.find({email: email}).toArray()
+      const result = await payments_collection.find({email: email}, {sort: {date: -1}}).toArray()
       res.send(result)
     })
 
