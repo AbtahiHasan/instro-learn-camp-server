@@ -212,7 +212,11 @@ async function run() {
       res.send({ insertResult, deleteResult });
     })
 
-
+    app.get("/payment-history", verifyToken, async (req, res) => {
+      const email = req?.query?.email
+      const result = await payments_collection.find({email: email}).toArray()
+      res.send(result)
+    })
 
 
     await client.db("admin").command({ ping: 1 });
