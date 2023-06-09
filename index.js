@@ -163,6 +163,12 @@ async function run() {
       res.send(result)
     })
 
+
+    // popular classes 
+    app.get("/popular-classes", async (req, res) => {
+      const result = await classes_collection.find({status: "approved"}, {sort: {enrolled: -1}}).limit(6).toArray()
+      res.send(result)
+    })
     // change status 
     app.put("/change-class-status/:id", verifyToken, verityAdmin, async (req, res) => {
       const status = req.body.status
