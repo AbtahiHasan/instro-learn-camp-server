@@ -257,7 +257,7 @@ async function run() {
       })
     })
 
-
+// TODO 
     app.post('/payments', verifyToken, async (req, res) => {
       const payment = req.body;
       const insertResult = await payments_collection.insertOne(payment);
@@ -282,6 +282,15 @@ async function run() {
         }
       })
       await enrolled_collection.insertMany(enrolled)
+
+      const updateValue = {
+        $inc: {
+          avilable_seats: -1,
+          enrolled: 1
+        }
+      }
+      await classes_collection.updateMany(classesQuery, updateValue)
+
       res.send({ insertResult, deleteResult });
     })
 
