@@ -126,7 +126,11 @@ async function run() {
        const classes = await classes_collection.find(filter).toArray()
        res.send(classes)
     })
-
+    app.get("/class/:id", async (req, res) => {
+      const id = req.params.id
+      const singleClass = await classes_collection.findOne({_id: new ObjectId(id)})
+      res.send(singleClass)
+   })
     app.post("/add-class", verifyToken, verityInstructor, async (req, res) => {
       const data = req.body 
       const newClass = {
@@ -142,6 +146,20 @@ async function run() {
       }
 
       const result = await classes_collection.insertOne(newClass)
+      res.send(result)
+    })
+
+    app.put("/update-class/:id", verifyToken, verityInstructor, async(req, res) => {
+      const id = req.params.id
+      const data = req.body
+      const updatedClass = {
+            $set : {
+              class_name : data.class_name,
+              avilable_seats : parseFloat(data.avilable_seats),
+              price : parseFloat(data.price)
+            }
+      }
+      const result = await classes_collection.updateOne({_id: new ObjectId(id)}, updatedClass)
       res.send(result)
     })
 
