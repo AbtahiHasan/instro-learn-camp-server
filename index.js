@@ -229,6 +229,11 @@ async function run() {
         res.send(result)
     })
 
+    app.delete("/delete-user/:id", verifyToken, async (req, res) => {
+      const id = req.params.id 
+      const result = await users_collection.deleteOne({_id: new ObjectId(id)})
+      res.send(result)
+    })
 
     app.post("/select-class", verifyToken, async(req, res) => {
       const singleClass = req.body
