@@ -100,11 +100,14 @@ async function run() {
       const filter = {
         email: email
       }
+
+      const savedUser = await users_collection.findOne(filter)
       const user = {
         $set: {
           name: userData?.name,
           email: userData?.email,
           photo_url: userData?.photo_url,
+          role: savedUser.role || "student"
         }
       }
       const options = { upsert: true };
@@ -294,7 +297,7 @@ async function run() {
       })
     })
 
-// TODO 
+
     app.post('/payments', verifyToken, async (req, res) => {
       const payment = req.body;
       const insertResult = await payments_collection.insertOne(payment);
