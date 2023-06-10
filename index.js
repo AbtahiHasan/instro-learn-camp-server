@@ -147,7 +147,7 @@ async function run() {
             enrolled: 0,
             feedback: "",
       }
-      // Todo 
+
 
       const instructor = await instructors_collection.findOne({email : data.instructor_email})
       
@@ -209,10 +209,10 @@ async function run() {
       const updatedRole = {
         $set: {
           role: role
-        },
-
+        }
       }
-      const result = await classes_collection.updateOne(filter, updatedRole)
+      const result = await users_collection.updateOne(filter, updatedRole)
+      console.log(result)
       res.send(result)
     })
 
