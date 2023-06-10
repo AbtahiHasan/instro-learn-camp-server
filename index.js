@@ -107,7 +107,7 @@ async function run() {
           name: userData?.name,
           email: userData?.email,
           photo_url: userData?.photo_url,
-          role: savedUser.role || "student"
+          role: savedUser?.role || "student"
         }
       }
       const options = { upsert: true };
