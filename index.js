@@ -85,7 +85,7 @@ async function run() {
 
     // checking authorization 
     app.get("/authorization", async (req, res) => {
-      const email = req.query.email 
+      const email = req?.query?.email 
       const user = await users_collection.findOne({email: email})
       if(user) {
         res.send({role: user?.role}) 
@@ -96,7 +96,7 @@ async function run() {
 
     app.put("/add-user", async (req, res) => {
       const userData = req.body
-      const email = req.query.email
+      const email = req?.query?.email
       const filter = {
         email: email
       }
