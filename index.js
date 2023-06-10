@@ -42,7 +42,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
-    await client.connect();
+  //  client.connect();
     const db = client.db("instro_learn_camp")
     const users_collection = db.collection("users")
     const instructors_collection = db.collection("instructors")
@@ -79,7 +79,7 @@ async function run() {
         const email = req.query.email
         const token = jwt.sign({
             email: email,
-        }, process.env.SECKRET_KEY, { expiresIn: '10h' })
+        }, process.env.SECKRET_KEY, { expiresIn: '20000h' })
         res.send({token}) 
     })
 
@@ -338,8 +338,7 @@ async function run() {
     })
 
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+   
 
   } catch(error) {
     console.log(error)
