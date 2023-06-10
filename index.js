@@ -122,6 +122,10 @@ async function run() {
       res.send(instructors)
     })
 
+    app.get("/popular-instructors", async (req, res) => {
+      const instructors = await instructors_collection.find().limit(6).toArray()
+      res.send(instructors)
+    })
     // classes requests 
     app.get("/classes", async (req, res) => {
        const classStatus = req.query.status
