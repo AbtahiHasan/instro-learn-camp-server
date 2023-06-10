@@ -144,6 +144,19 @@ async function run() {
             enrolled: 0,
             feedback: "",
       }
+      // Todo 
+
+      const instructor = await instructors_collection.findOne({email : data.instructor_email})
+      
+      if(!instructor) {
+        await instructors_collection.insertOne({
+          name: data.instructor_name,
+          image: data.instructor_photo,
+          email: data.instructor_email
+        })
+       
+      }
+      
 
       const result = await classes_collection.insertOne(newClass)
       res.send(result)
